@@ -293,6 +293,19 @@
         // The backend reads GROK_API_KEY from the server environment
         // (e.g. from a .env file). This keeps secrets on the server.
 
+        // If the static page is opened on GitHub Pages (or any host without
+        // the Flask backend), `/api/chat` will return HTML (404) and the
+        // previous code would display ``Unexpected token '<'``.  We add a
+        // startup warning so users understand why the chat doesn't work.
+
+        function showStartupWarning() {
+            if (location.hostname.endsWith('github.io')) {
+                addMessage(
+                    '⚠️ This frontend is hosted on GitHub Pages; the backend is not available. Run the app locally or deploy the Flask server to interact with the AI.',
+                    'ai-message'
+                );
+            }
+        }
 
         const chatBox = document.getElementById('chat-box');
         const userInput = document.getElementById('user-input');
