@@ -12,7 +12,9 @@ load_dotenv()
 # user now has a Grok model key, which uses a chat/completions URL.
 GROK_API_KEY = os.getenv("GROK_API_KEY")
 if not GROK_API_KEY:
-    raise RuntimeError("GROK_API_KEY not set in environment")
+    # don't crash on import; handle in requests so frontend can show a JSON error
+    GROK_API_KEY = None
+    print("WARNING: GROK_API_KEY not set in environment")
 
 GROK_API_URL = os.getenv(
     "GROK_API_URL",
@@ -31,6 +33,15 @@ CORS(app)  # allow cross‑origin for development; remove or lock down in produc
 def index():
     # serve the frontend HTML file (now named index.html)
     return send_from_directory('.', 'index.html')
+
+@app.before_request
+# ensure the API key is available for every request; returning JSON error
+# prevents Flask from giving back an HTML traceback which the frontend may
+# misinterpret (causing "Unexpected token '<'" errors).
+def check_api_key():
+    if request.path.startswith('/api') and not GROK_API_KEY:
+        return jsonify(error="GROK_API_KEY not configured on server"), 500
+
 
 @app.route('/api/chat', methods=['POST'])
 def chat():
@@ -129,6 +140,14 @@ def chat():
         ai_text = "Sorry, I didn't get a response from the AI."
 
     return jsonify(response=ai_text)
+
+
+# generic error handler so any uncaught exception also results in JSON rather
+# than an HTML traceback; this avoids the frontend seeing '<' characters.
+@app.errorhandler(Exception)
+def handle_exception(e):
+    # we can log the exception here if needed
+    return jsonify(error=str(e)), 500
 
 
 if __name__ == '__main__':

@@ -377,13 +377,20 @@
                     body: JSON.stringify({ message })
                 });
 
-                const data = await response.json();
+                let data;
+                try {
+                    data = await response.json();
+                } catch (parseErr) {
+                    // non-JSON response (likely HTML error page)
+                    const text = await response.text();
+                    throw new Error('Invalid JSON from server: ' + text);
+                }
+
                 chatBox.removeChild(typingDiv);
 
                 if (!response.ok) {
-                    let errMsg = data.error;
+                    let errMsg = data && data.error;
                     if (typeof errMsg === 'object') {
-                        // convert any object to a readable string
                         errMsg = JSON.stringify(errMsg);
                     }
                     errMsg = errMsg || response.statusText;
