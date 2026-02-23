@@ -69,7 +69,10 @@ This project is ready for deployment on [Render](https://render.com).
 2. **Environment variables:** set `GROK_API_KEY` (required) and
    optionally `GROK_MODEL` / `GROK_FALLBACK_MODEL` in the Render dashboard.
 3. Build & deploy; Render will install dependencies from `requirements.txt` and
-   use the provided `Procfile` to launch the app with Gunicorn.
+   use the provided `Procfile` to launch the app with Gunicorn. The Procfile
+   refers to `app:app` (the `app` variable in `app.py`); if your deployment
+   platform defaults to looking for a callable named `application` you can also
+   reference `app:application` because the code exposes that alias.
 
 The service listens on the port specified by the `PORT` environment variable
 (automatically supplied by Render).  The `runtime.txt` locks the Python version

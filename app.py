@@ -150,6 +150,11 @@ def handle_exception(e):
     return jsonify(error=str(e)), 500
 
 
+# some deploy platforms (including Render) may expect the WSGI callable to be
+# named ``application`` rather than ``app``.  expose it here so that running
+# ``gunicorn app:application`` works even if the default command is mis‑configured.
+application = app
+
 if __name__ == '__main__':
     # use PORT environment variable for compatibility with Render and other hosts
     port = int(os.environ.get('PORT', 5000))
