@@ -31,8 +31,12 @@ CORS(app)  # allow cross‑origin for development; remove or lock down in produc
 
 @app.route('/')
 def index():
-    # serve the frontend HTML file (now named index.html)
-    return send_from_directory('.', 'index.html')
+    # serve the frontend HTML file which lives at the project root rather
+    # than inside the ``app`` package. ``send_from_directory`` interprets
+    # a relative path with respect to ``app.root_path`` (the package
+    # directory), so we compute the absolute path explicitly.
+    root = os.path.abspath(os.path.join(app.root_path, os.pardir))
+    return send_from_directory(root, 'index.html')
 
 @app.before_request
 # ensure the API key is available for every request; returning JSON error
