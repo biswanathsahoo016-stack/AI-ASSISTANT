@@ -61,6 +61,22 @@ Copy your API key into `.env` or set the `GROK_API_KEY` environment variable.  Y
 
 ---
 
+## Render Deployment
+
+This project is ready for deployment on [Render](https://render.com).
+
+1. **Connect your GitHub repository** to Render and create a new "Web Service".
+2. **Environment variables:** set `GROK_API_KEY` (required) and
+   optionally `GROK_MODEL` / `GROK_FALLBACK_MODEL` in the Render dashboard.
+3. Build & deploy; Render will install dependencies from `requirements.txt` and
+   use the provided `Procfile` to launch the app with Gunicorn.
+
+The service listens on the port specified by the `PORT` environment variable
+(automatically supplied by Render).  The `runtime.txt` locks the Python version
+for reproducible builds.
+
+---
+
 If you change the frontend filename in the future, update the `index()` route in `app.py` accordingly.
 
 > **Tip:** an older copy named `APP1.html` may still exist in the repo. You can remove it if it’s no longer needed to avoid confusion.
